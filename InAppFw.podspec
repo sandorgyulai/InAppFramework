@@ -38,6 +38,6 @@ Pod::Spec.new do |s|
   s.framework = "UIKit"
 
   # 8
-  s.source_files = "RWPickFlavor/**/*.{swift}"
+  s.source_files = "InAppFw/**/*.{swift}"
 
 end
