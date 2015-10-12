@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
   s.name         = "InAppFw"
   s.version      = "0.0.1"
-  s.summary      = "A short description of InAppFw."
+  s.summary      = "In App Purchase Manager framework for iOS"
 
   s.ios.deployment_target = '8.0'
   s.requires_arc = true

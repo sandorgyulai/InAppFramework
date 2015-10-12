@@ -10,6 +10,7 @@
 		555A3BAC1BCBF8E300FD9E58 /* InAppFw.h in Headers */ = {isa = PBXBuildFile; fileRef = 555A3BAB1BCBF8E300FD9E58 /* InAppFw.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		555A3BB31BCBF8E300FD9E58 /* InAppFw.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555A3BA81BCBF8E300FD9E58 /* InAppFw.framework */; settings = {ASSET_TAGS = (); }; };
 		555A3BB81BCBF8E300FD9E58 /* InAppFwTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555A3BB71BCBF8E300FD9E58 /* InAppFwTests.swift */; };
+		555A3BC31BCBFBE900FD9E58 /* InAppFw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555A3BC21BCBFBE900FD9E58 /* InAppFw.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		555A3BB21BCBF8E300FD9E58 /* InAppFwTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InAppFwTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		555A3BB71BCBF8E300FD9E58 /* InAppFwTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppFwTests.swift; sourceTree = "<group>"; };
 		555A3BB91BCBF8E300FD9E58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		555A3BC21BCBFBE900FD9E58 /* InAppFw.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppFw.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				555A3BAB1BCBF8E300FD9E58 /* InAppFw.h */,
+				555A3BC21BCBFBE900FD9E58 /* InAppFw.swift */,
 				555A3BAD1BCBF8E300FD9E58 /* Info.plist */,
 			);
 			path = InAppFw;
@@ -142,6 +145,7 @@
 		555A3B9F1BCBF8E300FD9E58 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Sándor Gyulai";
 				TargetAttributes = {
@@ -193,6 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				555A3BC31BCBFBE900FD9E58 /* InAppFw.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,6 +312,7 @@
 		555A3BBD1BCBF8E300FD9E58 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -317,12 +323,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandorgyulai.InAppFw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		555A3BBE1BCBF8E300FD9E58 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
