@@ -1,26 +1,43 @@
 Pod::Spec.new do |s|
 
-  s.name         = "InAppFw"
-  s.version      = "0.0.1c"
-  s.summary      = "In App Purchase Manager framework for iOS"
+  # 1
+  s.platform = :ios
+  s.ios.deployment_target = '8.0'
+  s.name = "InAppFw"
+  s.summary = "In App Purchase Manager framework for iOS"
+  s.requires_arc = true
 
-  s.description  = <<-DESC
-                   A longer description of InAppFw in Markdown format.
+  # 2
+  s.version = "0.0.1e"
 
-                   * Think: Why did you write this? What is the focus? What does it do?
-                   * CocoaPods will be using this to generate tags, and improve search results.
-                   * Try to keep it short, snappy and to the point.
-                   * Finally, don't worry about the indent, CocoaPods strips it!
-                   DESC
-
-  s.homepage     = "https://github.com/sandorgyulai/InAppFramework"
-
+  # 3
   s.license = { :type => "MIT", :file => "LICENSE" }
 
-  s.author = { "Sándor Gyulai" => "sandor.gyulai@icloud.com" }
+  # 4 - Replace with your name and e-mail address
+  s.author = { "Sandor Gyulai" => "sandor.gyulai@icloud.com" }
 
-  s.source = { :git => "https://github.com/sandorgyulai/InAppFramework.git", :tag => "#{s.version}" }
+  # For example,
+  # s.author = { "Joshua Greene" => "jrg.developer@gmail.com" }
 
-  s.source_files = "InAppFw/**/*.{swift}"
+
+  # 5 - Replace this URL with your own Github page's URL (from the address bar)
+  s.homepage = "https://github.com/sandorgyulai/InAppFramework"
+
+  # For example,
+  # s.homepage = "https://github.com/JRG-Developer/RWPickFlavor"
+
+
+  # 6 - Replace this URL with your own Git URL from "Quick Setup"
+  s.source = { :git => "https://github.com/sandorgyulai/InAppFramework.git", :tag => "#{s.version}"}
+
+  # For example,
+  # s.source = { :git => "https://github.com/JRG-Developer/RWPickFlavor.git", :tag => "#{s.version}"}
+
+
+  # 7
+  s.framework = "UIKit"
+
+  # 8
+  s.source_files = "RWPickFlavor/**/*.{swift}"
 
 end
