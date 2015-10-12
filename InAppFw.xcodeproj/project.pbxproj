@@ -319,6 +319,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = InAppFw/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandorgyulai.InAppFw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -337,6 +338,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = InAppFw/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandorgyulai.InAppFw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -383,6 +385,7 @@
 				555A3BBE1BCBF8E300FD9E58 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		555A3BBF1BCBF8E300FD9E58 /* Build configuration list for PBXNativeTarget "InAppFwTests" */ = {
 			isa = XCConfigurationList;
@@ -391,6 +394,7 @@
 				555A3BC11BCBF8E300FD9E58 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
