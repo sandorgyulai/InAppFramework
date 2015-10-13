@@ -13,21 +13,22 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     
     public let ProductPurchasedNotification = "IAPPurchasedNotification"
     
-    static let sharedInstance = InAppFw()
+    public static let sharedInstance = InAppFw()
     
     var productIdentifiers: Set<String>?
     var productsRequest: SKProductsRequest?
     
-    var completionHandler: ((success: Bool, products: [AnyObject]?) -> Void)?
+    var completionHandler: ((success: Bool, products: [SKProduct]?) -> Void)?
     
     var purchasedProductIdentifiers = Set<String>()
     
-    var hasValidReceipt = false
+    public var hasValidReceipt = false
     
     public override init() {
         super.init()
         SKPaymentQueue.defaultQueue().addTransactionObserver(self)
         //loadPurchasedProducts(true)
+        productIdentifiers = Set<String>()
     }
     
     public func addProductId(id: String) {
@@ -54,6 +55,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
             }
             
             if checkWithApple {
+                print("Checking with Apple...")
                 if let completion = completion {
                     validateReceipt(false, completion: completion)
                 } else {
@@ -93,10 +95,11 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
                 storeRequest.HTTPBody = requestData
                 
                 let queue = NSOperationQueue()
- 
-                NSURLConnection.sendAsynchronousRequest(storeRequest, queue: queue, completionHandler: { (response, data, error) -> Void in
-                    if (error != nil) {
-                        print("Validation Request Error: \(error)")
+                
+                NSURLConnection.sendAsynchronousRequest(storeRequest, queue: queue, completionHandler: { (response, data, connectionError) -> Void in
+                    if (connectionError != nil) {
+                        print("Validation Error: \(connectionError)")
+                        self.hasValidReceipt = false
                         completion(valid: false)
                     } else {
                         self.checkStatus(data, completion: completion)
@@ -119,7 +122,6 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
             if let data = data, let jsonResponse: AnyObject = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()) {
                 
                 if let status = jsonResponse["status"] as? Int {
-                    //print("Validation Status: \(status)")
                     if status == 0 {
                         print("Status: VALID")
                         self.hasValidReceipt = true
@@ -140,14 +142,17 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         }
     }
     
-    public func requestProducts(completionHandler: (success:Bool, products:[AnyObject]?) -> Void) {
+    public func requestProducts(completionHandler: (success:Bool, products:[SKProduct]?) -> Void) {
         self.completionHandler = completionHandler
+        
+        print("Requesting Products")
         
         if let productIdentifiers = productIdentifiers {
             productsRequest = SKProductsRequest(productIdentifiers: productIdentifiers)
             productsRequest!.delegate = self
             productsRequest!.start()
         } else {
+            print("No productIdentifiers")
             completionHandler(success: false, products: nil)
         }
         
@@ -257,6 +262,24 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
             completionHandler(success: false, products: nil)
         }
         completionHandler = nil
+    }
+    
+    //MARK: - Helpers
+    
+    public func canMakePurchase() -> Bool {
+        return SKPaymentQueue.canMakePayments()
+    }
+    
+    public class func formatPrice(price: NSNumber, locale: NSLocale) -> String {
+        var formattedString = ""
+        
+        let numberFormatter = NSNumberFormatter()
+        numberFormatter.formatterBehavior = NSNumberFormatterBehavior.Behavior10_4
+        numberFormatter.numberStyle = NSNumberFormatterStyle.CurrencyStyle
+        numberFormatter.locale = locale
+        formattedString = numberFormatter.stringFromNumber(price)!
+        
+        return formattedString
     }
     
 }
