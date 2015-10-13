@@ -1,11 +1,11 @@
 # InAppFramework
 In App Purchase Manager framework for iOS
 
-##### ToDo
+##### ToDo for 1.0
 
 - ☐ Documentation!!
+- ☐ Change productPurchased(productIdentifier: String) -> Bool to return Tuple with 2 bools to replace hasValidReceipt property
 - ☑︎ Change NSURLConnection to NSURLSession
-- ☐ New features...
 
 ### Installation
 
@@ -20,7 +20,7 @@ pod 'InAppFw'
 * Register for Notifications with the name below where you want to do something
 
 ```
-ProductPurchasedNotification
+ProductPurchasedNotificationName
 ```
 
 * Add your product identifiers
