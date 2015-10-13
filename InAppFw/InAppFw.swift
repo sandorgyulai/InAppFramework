@@ -1,17 +1,31 @@
+//  The MIT License (MIT)
 //
-//  InAppFw.swift
-//  InAppFw
+//  Copyright (c) 2015 Sándor Gyulai
 //
-//  Created by Sándor Gyulai on 12/10/15.
-//  Copyright © 2015 Sándor Gyulai. All rights reserved.
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
 //
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
 
 import UIKit
 import StoreKit
 
 public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver{
     
-    public let ProductPurchasedNotification = "IAPPurchasedNotification"
+    public let ProductPurchasedNotificationName = "IAPPurchasedNotification"
     
     public static let sharedInstance = InAppFw()
     
@@ -27,7 +41,6 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     public override init() {
         super.init()
         SKPaymentQueue.defaultQueue().addTransactionObserver(self)
-        //loadPurchasedProducts(true)
         productIdentifiers = Set<String>()
     }
     
@@ -42,11 +55,13 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     public func loadPurchasedProducts(checkWithApple: Bool, completion: ((valid: Bool) -> Void)?) {
         
         if let productIdentifiers = productIdentifiers {
+            
             for productIdentifier in productIdentifiers {
                 
                 let isPurchased = NSUserDefaults.standardUserDefaults().boolForKey(productIdentifier)
                 
                 if isPurchased {
+                    purchasedProductIdentifiers.insert(productIdentifier)
                     print("Purchased: \(productIdentifier)")
                 } else {
                     print("Not purchased: \(productIdentifier)")
@@ -59,15 +74,12 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
                 if let completion = completion {
                     validateReceipt(false, completion: completion)
                 } else {
-                    validateReceipt(false, completion: { (valid) -> Void in
-                        if valid {
-                            print("Receipt is Valid!")
-                        } else {
-                            print("BEWARE! Reciept is not Valid!!!")
-                        }
-                    })
+                    validateReceipt(false) { (valid) -> Void in
+                        if valid { print("Receipt is Valid!") } else { print("BEWARE! Reciept is not Valid!!!") }
+                    }
                 }
             }
+            
         }
         
     }
@@ -80,7 +92,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         if let r = receipt {
             
             let receiptData = r.base64EncodedStringWithOptions(NSDataBase64EncodingOptions())
-            let requestContent = ["receipt-data":receiptData]
+            let requestContent = [ "receipt-data" : receiptData ]
             
             do {
                 let requestData = try NSJSONSerialization.dataWithJSONObject(requestContent, options: NSJSONWritingOptions())
@@ -94,17 +106,17 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
                 storeRequest.HTTPMethod = "POST"
                 storeRequest.HTTPBody = requestData
                 
-                let queue = NSOperationQueue()
-                
-                NSURLConnection.sendAsynchronousRequest(storeRequest, queue: queue, completionHandler: { (response, data, connectionError) -> Void in
-                    if (connectionError != nil) {
-                        print("Validation Error: \(connectionError)")
+                let task = NSURLSession.sharedSession().dataTaskWithRequest(storeRequest, completionHandler: { (data, response, error) -> Void in
+                    if (error != nil) {
+                        print("Validation Error: \(error)")
                         self.hasValidReceipt = false
                         completion(valid: false)
                     } else {
                         self.checkStatus(data, completion: completion)
                     }
                 })
+                
+                task.resume()
                 
             } catch {
                 print("validateReceipt: Caught error")
@@ -172,7 +184,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         SKPaymentQueue.defaultQueue().restoreCompletedTransactions()
     }
     
-    //MARK: - Product Completions
+    //MARK: - Transactions
     
     private func completeTransaction(transaction: SKPaymentTransaction) {
         print("Complete Transaction...")
@@ -206,7 +218,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         NSUserDefaults.standardUserDefaults().setBool(true, forKey: productIdentifier)
         NSUserDefaults.standardUserDefaults().synchronize()
         
-        NSNotificationCenter.defaultCenter().postNotificationName(ProductPurchasedNotification, object: productIdentifier, userInfo: nil)
+        NSNotificationCenter.defaultCenter().postNotificationName(ProductPurchasedNotificationName, object: productIdentifier, userInfo: nil)
         
     }
     

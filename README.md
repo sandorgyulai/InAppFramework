@@ -1,12 +1,18 @@
 # InAppFramework
 In App Purchase Manager framework for iOS
 
+##### ToDo
+
+- ☐ Documentation!!
+- ☑︎ Change NSURLConnection to NSURLSession
+- ☐ New features...
+
 ### Installation
 
 #### Cocoapods
 
 ```
-pod 'InAppFw' 
+pod 'InAppFw'
 ```
 
 ### Usage
@@ -32,13 +38,13 @@ InAppFw.sharedInstance.addProductIds(ids: Set<String>)
 * Request products from Apple
 
 ```
-InAppFw.sharedInstance.requestProducts(completionHandler: (success:Bool, products:[SKProduct]?) 
+InAppFw.sharedInstance.requestProducts(completionHandler: (success:Bool, products:[SKProduct]?)
 ```
 
 * Load the previously purchased products
 
 ```
-InAppFw.sharedInstance.loadPurchasedProducts(checkWithApple: Bool, completion: ((valid: Bool) -> Void)?) 
+InAppFw.sharedInstance.loadPurchasedProducts(checkWithApple: Bool, completion: ((valid: Bool) -> Void)?)
 ```
 
 "checkWithApple" if true will validate the Purchase receipt with Apple Servers too. The completion will be only true if the receipt was valid
@@ -49,7 +55,7 @@ InAppFw.sharedInstance.loadPurchasedProducts(checkWithApple: Bool, completion: (
 InAppFw.sharedInstance.purchaseProduct(product: SKProduct)
 ```
 
-* Or Restore products purchased on an other device 
+* Or Restore products purchased on an other device
 
 ```
 InAppFw.sharedInstance.restoreCompletedTransactions()
