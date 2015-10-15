@@ -44,14 +44,29 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         productIdentifiers = Set<String>()
     }
     
+    /**
+        Add a single product ID
+    
+        - Parameter id: Product ID in string format
+    */
     public func addProductId(id: String) {
         productIdentifiers?.insert(id)
     }
     
+    /**
+        Add multiple product IDs
+    
+        - Parameter ids: Set of product ID strings you wish to add
+    */
     public func addProductIds(ids: Set<String>) {
         productIdentifiers?.unionInPlace(ids)
     }
     
+    /**
+        Load purchased products
+    
+        - Parameter checkWithApple: True if you want to validate the purchase receipt with Apple servers
+    */
     public func loadPurchasedProducts(checkWithApple: Bool, completion: ((valid: Bool) -> Void)?) {
         
         if let productIdentifiers = productIdentifiers {
@@ -154,6 +169,9 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         }
     }
     
+    /**
+        Request products from Apple
+    */
     public func requestProducts(completionHandler: (success:Bool, products:[SKProduct]?) -> Void) {
         self.completionHandler = completionHandler
         
@@ -170,16 +188,27 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         
     }
     
+    /**
+        Initiate purchase for the product
+    
+        - Parameter product: The product you want to purchase
+    */
     public func purchaseProduct(product: SKProduct) {
         print("Purchasing product: \(product.productIdentifier)")
         let payment = SKPayment(product: product)
         SKPaymentQueue.defaultQueue().addPayment(payment)
     }
     
+    /**
+        Check if the product with identifier is already purchased
+    */
     public func productPurchased(productIdentifier: String) -> Bool {
         return purchasedProductIdentifiers.contains(productIdentifier)
     }
     
+    /**
+        Begin to start restoration of already purchased products
+    */
     public func restoreCompletedTransactions() {
         SKPaymentQueue.defaultQueue().restoreCompletedTransactions()
     }
@@ -210,7 +239,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         
         SKPaymentQueue.defaultQueue().finishTransaction(transaction)
     }
-
+    
     private func provideContentForProductIdentifier(productIdentifier: String!) {
     
         purchasedProductIdentifiers.insert(productIdentifier)
@@ -278,10 +307,23 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     
     //MARK: - Helpers
     
+    /**
+        Check if the user can make purchase
+    */
     public func canMakePurchase() -> Bool {
         return SKPaymentQueue.canMakePayments()
     }
     
+    //MARK: - Class Functions
+    
+    /**
+        Format the price for the given locale
+    
+        - Parameter price:  The price you want to format
+        - Parameter locale: The price locale you want to format with
+    
+        - Returns: The formatted price
+    */
     public class func formatPrice(price: NSNumber, locale: NSLocale) -> String {
         var formattedString = ""
         
