@@ -3,7 +3,7 @@ In App Purchase Manager framework for iOS
 
 ##### ToDo for 1.0
 
-- ☐ Documentation!!
+- ☐ Documentation!! Work in progress
 - ☐ Change productPurchased(productIdentifier: String) -> Bool to return Tuple with 2 bools to replace hasValidReceipt property
 - ☑︎ Change NSURLConnection to NSURLSession
 
