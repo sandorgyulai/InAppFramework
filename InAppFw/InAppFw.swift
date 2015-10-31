@@ -36,7 +36,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     
     var purchasedProductIdentifiers = Set<String>()
     
-    public var hasValidReceipt = false
+    private var hasValidReceipt = false
     
     public override init() {
         super.init()
@@ -151,14 +151,14 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
                 if let status = jsonResponse["status"] as? Int {
                     if status == 0 {
                         print("Status: VALID")
-                        self.hasValidReceipt = true
+                        hasValidReceipt = true
                         completion(valid: true)
                     } else if status == 21007 {
                         print("Status: CHECK WITH SANDBOX")
-                        self.validateReceipt(true, completion: completion)
+                        validateReceipt(true, completion: completion)
                     } else {
                         print("Status: INVALID")
-                        self.hasValidReceipt = false
+                        hasValidReceipt = false
                         completion(valid: false)
                     }
                 }
@@ -202,8 +202,11 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     /**
         Check if the product with identifier is already purchased
     */
-    public func productPurchased(productIdentifier: String) -> Bool {
-        return purchasedProductIdentifiers.contains(productIdentifier)
+    public func productPurchased(productIdentifier: String) -> (isPurchased: Bool, hasValidReceipt: Bool) {
+        
+        let purchased = purchasedProductIdentifiers.contains(productIdentifier)
+        return (purchased, hasValidReceipt)
+        
     }
     
     /**
@@ -218,14 +221,14 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     private func completeTransaction(transaction: SKPaymentTransaction) {
         print("Complete Transaction...")
         
-        self.provideContentForProductIdentifier(transaction.payment.productIdentifier)
+        provideContentForProductIdentifier(transaction.payment.productIdentifier)
         SKPaymentQueue.defaultQueue().finishTransaction(transaction)
     }
     
     private func restoreTransaction(transaction: SKPaymentTransaction) {
         print("Restore Transaction...")
         
-        self.provideContentForProductIdentifier(transaction.originalTransaction!.payment.productIdentifier)
+        provideContentForProductIdentifier(transaction.originalTransaction!.payment.productIdentifier)
         SKPaymentQueue.defaultQueue().finishTransaction(transaction)
     }
     
