@@ -9,7 +9,7 @@ In App Purchase Manager framework for iOS
 
 ### Installation
 
-#### Cocoapods
+#### CocoaPods
 
 ```
 pod 'InAppFw'
