@@ -23,9 +23,10 @@
 import UIKit
 import StoreKit
 
+let kIAPPurchasedNotification = "IAPPurchasedNotification"
+let kIAPFailedNotification = "IAPFailedNotification"
+
 public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver{
-    
-    public let ProductPurchasedNotificationName = "IAPPurchasedNotification"
     
     public static let sharedInstance = InAppFw()
     
@@ -185,7 +186,6 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
             print("No productIdentifiers")
             completionHandler(success: false, products: nil)
         }
-        
     }
     
     /**
@@ -203,10 +203,8 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         Check if the product with identifier is already purchased
     */
     public func productPurchased(productIdentifier: String) -> (isPurchased: Bool, hasValidReceipt: Bool) {
-        
         let purchased = purchasedProductIdentifiers.contains(productIdentifier)
         return (purchased, hasValidReceipt)
-        
     }
     
     /**
@@ -235,23 +233,21 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
     private func failedTransaction(transaction: SKPaymentTransaction) {
         print("Failed Transaction...")
         
-        if (transaction.error!.code != SKErrorPaymentCancelled)
-        {
+        if (transaction.error!.code != SKErrorPaymentCancelled) {
             print("Transaction error \(transaction.error!.code): \(transaction.error!.localizedDescription)")
         }
         
         SKPaymentQueue.defaultQueue().finishTransaction(transaction)
+        NSNotificationCenter.defaultCenter().postNotificationName(kIAPFailedNotification, object: nil, userInfo: nil)
     }
     
     private func provideContentForProductIdentifier(productIdentifier: String!) {
-    
         purchasedProductIdentifiers.insert(productIdentifier)
         
         NSUserDefaults.standardUserDefaults().setBool(true, forKey: productIdentifier)
         NSUserDefaults.standardUserDefaults().synchronize()
         
-        NSNotificationCenter.defaultCenter().postNotificationName(ProductPurchasedNotificationName, object: productIdentifier, userInfo: nil)
-        
+        NSNotificationCenter.defaultCenter().postNotificationName(kIAPPurchasedNotification, object: productIdentifier, userInfo: nil)
     }
     
     // MARK: - Delegate Implementations
@@ -261,8 +257,7 @@ public class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionO
         {
             if let trans = transaction as? SKPaymentTransaction
             {
-                switch trans.transactionState
-                {
+                switch trans.transactionState {
                 case .Purchased:
                     completeTransaction(trans)
                     break
