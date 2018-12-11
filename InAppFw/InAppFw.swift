@@ -23,12 +23,16 @@
 import UIKit
 import StoreKit
 
-let kIAPPurchasedNotification = "IAPPurchasedNotification"
-let kIAPFailedNotification = "IAPFailedNotification"
+extension Notification.Name {
+    
+    static let iapPurchased = Notification.Name("IAPPurchasedNotification")
+    static let iapFailed = Notification.Name("IAPFailedNotification")
+    
+}
 
 open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver{
     
-    open static let sharedInstance = InAppFw()
+    public static let sharedInstance = InAppFw()
     
     var productIdentifiers: Set<String>?
     var productsRequest: SKProductsRequest?
@@ -50,7 +54,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
         - Parameter id: Product ID in string format
     */
-    open func addProductId(_ id: String) {
+    open func addProduct(_ id: String) {
         productIdentifiers?.insert(id)
     }
     
@@ -59,7 +63,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
         - Parameter ids: Set of product ID strings you wish to add
     */
-    open func addProductIds(_ ids: Set<String>) {
+    open func addProduct(_ ids: Set<String>) {
         productIdentifiers?.formUnion(ids)
     }
     
@@ -68,7 +72,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
         - Parameter checkWithApple: True if you want to validate the purchase receipt with Apple servers
     */
-    open func loadPurchasedProducts(_ checkWithApple: Bool, completion: ((_ valid: Bool) -> Void)?) {
+    open func loadPurchasedProducts(validate: Bool, completion: ((_ valid: Bool) -> Void)?) {
         
         if let productIdentifiers = productIdentifiers {
             
@@ -85,7 +89,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
                 
             }
             
-            if checkWithApple {
+            if validate {
                 print("Checking with Apple...")
                 if let completion = completion {
                     validateReceipt(false, completion: completion)
@@ -100,7 +104,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
         
     }
     
-    fileprivate func validateReceipt(_ sandbox: Bool, completion:@escaping (_ valid: Bool) -> Void) {
+    fileprivate func validateReceipt(_ sandbox: Bool, completion: @escaping (_ valid: Bool) -> Void) {
         
         let url = Bundle.main.appStoreReceiptURL
         let receipt = try? Data(contentsOf: url!)
@@ -116,20 +120,21 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
                 let storeURL = URL(string: "https://buy.itunes.apple.com/verifyReceipt")
                 let sandBoxStoreURL = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")
                 
-                let finalURL = sandbox ? sandBoxStoreURL : storeURL
+                guard let finalURL = sandbox ? sandBoxStoreURL : storeURL else {
+                    return
+                }
                 
-                var storeRequest = URLRequest(url: finalURL!)//NSMutableURLRequest(url: finalURL!)
+                var storeRequest = URLRequest(url: finalURL)
                 storeRequest.httpMethod = "POST"
                 storeRequest.httpBody = requestData
                 
-                
-                let task = URLSession.shared.dataTask(with: storeRequest, completionHandler: { (data, response, error) -> Void in
+                let task = URLSession.shared.dataTask(with: storeRequest, completionHandler: { [weak self] (data, response, error) -> Void in
                     if (error != nil) {
-                        print("Validation Error: \(error)")
-                        self.hasValidReceipt = false
+                        print("Validation Error: \(String(describing: error))")
+                        self?.hasValidReceipt = false
                         completion(false)
                     } else {
-                        self.checkStatus(data, completion: completion)
+                        self?.checkStatus(with: data, completion: completion)
                     }
                 })
                 
@@ -146,7 +151,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
         
     }
     
-    fileprivate func checkStatus(_ data: Data?, completion:@escaping (_ valid: Bool) -> Void) {
+    fileprivate func checkStatus(with data: Data?, completion: @escaping (_ valid: Bool) -> Void) {
         do {
             if let data = data, let jsonResponse = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()) as? [String: AnyObject] {
                 
@@ -194,7 +199,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
         - Parameter product: The product you want to purchase
     */
-    open func purchaseProduct(_ product: SKProduct) {
+    open func purchase(_ product: SKProduct) {
         print("Purchasing product: \(product.productIdentifier)")
         let payment = SKPayment(product: product)
         SKPaymentQueue.default().add(payment)
@@ -203,7 +208,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     /**
         Check if the product with identifier is already purchased
     */
-    open func productPurchased(_ productIdentifier: String) -> (isPurchased: Bool, hasValidReceipt: Bool) {
+    open func checkPurchase(for productIdentifier: String) -> (isPurchased: Bool, hasValidReceipt: Bool) {
         let purchased = purchasedProductIdentifiers.contains(productIdentifier)
         return (purchased, hasValidReceipt)
     }
@@ -233,13 +238,8 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
     fileprivate func failedTransaction(_ transaction: SKPaymentTransaction) {
         print("Failed Transaction...")
-        
-        //if (transaction.error!.code != SKError.paymentCancelled.rawValue) {
-        //    print("Transaction error \(transaction.error!.code): \(transaction.error!.localizedDescription)")
-        //}
-        
         SKPaymentQueue.default().finishTransaction(transaction)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: kIAPFailedNotification), object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: .iapPurchased, object: nil, userInfo: nil)
     }
     
     fileprivate func provideContentForProductIdentifier(_ productIdentifier: String!) {
@@ -248,7 +248,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
         UserDefaults.standard.set(true, forKey: productIdentifier)
         UserDefaults.standard.synchronize()
         
-        NotificationCenter.default.post(name: Notification.Name(rawValue: kIAPPurchasedNotification), object: productIdentifier, userInfo: nil)
+        NotificationCenter.default.post(name: .iapFailed, object: productIdentifier, userInfo: nil)
     }
     
     // MARK: - Delegate Implementations
