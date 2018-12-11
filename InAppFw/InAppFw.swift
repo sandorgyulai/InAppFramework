@@ -63,7 +63,7 @@ open class InAppFw: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObs
     
         - Parameter ids: Set of product ID strings you wish to add
     */
-    open func addProduct(_ ids: Set<String>) {
+    open func addProducts(_ ids: Set<String>) {
         productIdentifiers?.formUnion(ids)
     }
     
