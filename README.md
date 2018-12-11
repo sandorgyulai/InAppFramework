@@ -1,6 +1,9 @@
 # InAppFramework
 In App Purchase Manager framework for iOS
 
+### Disclaimer
+I know it's been too long since the last update, quite a few things happened in my life, but now I am back again and started with a nice update for Swift 4.2 compatibility. More to come, stay tuned!
+
 ##### ToDo for 1.0
 
 - ☐ Documentation!! Work in progress
